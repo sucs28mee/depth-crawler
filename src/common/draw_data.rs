@@ -4,11 +4,13 @@ use macroquad::prelude::*;
 
 use super::vector2::Vector2;
 
+#[derive(Debug)]
 pub enum FlipSprite {
     FlipHorizontal,
     FlipVertical
 }
 
+#[derive(Debug)]
 pub struct DrawData {
     pub index: i32,
     pub texture: Texture2D,
@@ -46,7 +48,7 @@ impl DrawDataCache {
 
     pub fn draw_cache(&mut self) {
         self.cache.sort_by(|a, b| a.index.cmp(&b.index));
-        
+
         let cache_iter: Iter<DrawData> = self.cache.iter();
         for draw_data in cache_iter {
             let mut flip_x = false;
@@ -64,9 +66,9 @@ impl DrawDataCache {
                 draw_data.texture, 
                 draw_data.position.x,
                 draw_data.position.y,
-                draw_data.color, 
+                draw_data.color,
                 DrawTextureParams { 
-                    dest_size: Some(Vec2::new(draw_data.size.x, draw_data.size.y)),
+                    dest_size: Some(Vec2::new(draw_data.size.x * draw_data.texture.width(), draw_data.size.y * draw_data.texture.height())),
                     source: draw_data.source, 
                     rotation: draw_data.rotation, 
                     flip_x, 

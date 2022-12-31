@@ -1,7 +1,7 @@
 mod common;
 use common::game::Game;
 
-#[macroquad::main("terraria-but-scuffed")]
+#[macroquad::main("Depth Crawler")]
 async fn main() {
     Game::new().run().await;
 }

@@ -6,13 +6,13 @@ pub struct Player {
 
 impl Player {
     pub fn new() -> Player {
-        Player { hitbox: Rectangle::new(10., 10., 100., 100.) }
+        Player { hitbox: Rectangle::new(10., 10., 10., 10.) }
     }
 }
 
 impl Entity for Player {
     fn update(&mut self, delta_time: f32) {
-        self.hitbox.position += Vector2::ONE * 10. * delta_time;
+        //self.hitbox.position += Vector2::ONE * 10. * delta_time;
     }
 
     fn draw(&self, cache: &mut DrawDataCache, assets: &mut Assets, screen_position: Vector2) {

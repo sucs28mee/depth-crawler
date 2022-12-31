@@ -51,7 +51,7 @@ impl Game {
         self.fps = 1f32 / delta_time;
         match self.game_state {
             GameState::InWorld => {
-                self.screen_position.lerp(self.player.hitbox.center() - Vector2::new(screen_width(), screen_height()), 0.15);
+                self.screen_position.lerp(self.player.hitbox.center() - Vector2::new(screen_width(), screen_height()) * 0.5, 0.15);
 
                 self.player.update(delta_time);
                 for entity in &mut self.entities {
