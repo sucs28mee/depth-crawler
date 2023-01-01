@@ -140,6 +140,17 @@ impl DivAssign<f32> for Vector2 {
     }
 }
 
+impl Neg for Vector2 {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Self {
+            x: -self.x,
+            y: -self.y
+        }
+    }
+}
+
 
 impl From<[f32; 2]> for Vector2 {
     #[inline]

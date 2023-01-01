@@ -13,9 +13,7 @@ pub struct Assets {
 
 impl Assets {
     pub fn new() -> Assets {
-        Assets {
-            asset_cache: HashMap::new() 
-        }
+        Assets { asset_cache: HashMap::new() }
     }
 
     /// Gets the texture with specified path from the assets folder.

@@ -4,15 +4,21 @@ use macroquad::prelude::*;
 
 use super::vector2::Vector2;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum FlipSprite {
     FlipHorizontal,
     FlipVertical
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum DrawLayer {
+    Entities,
+    OverEntities
+}
+
 #[derive(Debug)]
 pub struct DrawData {
-    pub index: i32,
+    pub draw_layer: DrawLayer,
     pub texture: Texture2D,
     pub position: Vector2,
     pub rotation: f32,
@@ -25,11 +31,23 @@ pub struct DrawData {
 
 impl DrawData {
     pub fn new(texture: Texture2D, position: Vector2) -> DrawData {
-        DrawData { index: 0, texture, position, rotation: 0., color: WHITE, origin: Vector2::ZERO, size: Vector2::ONE, source: None, flip_sprite: None }
+        DrawData { draw_layer: DrawLayer::Entities, texture, position, rotation: 0., color: WHITE, origin: Vector2::ZERO, size: Vector2::ONE, source: None, flip_sprite: None }
     }
 
-    pub fn new_custom<F>(texture: Texture2D, position: Vector2, func: F) -> DrawData where F: FnOnce(Self) -> Self {
-        func(DrawData { index: 0, texture, position, rotation: 0., color: WHITE, origin: Vector2::ZERO, size: Vector2::ONE, source: None, flip_sprite: None })
+    pub fn new_custom<F>(texture: Texture2D, position: Vector2, func: F) -> DrawData where F: FnOnce(&mut Self) {
+        let mut draw_data: DrawData = DrawData { 
+            draw_layer: DrawLayer::Entities, 
+            texture, 
+            position, 
+            rotation: 0., 
+            color: WHITE, 
+            origin: Vector2::ZERO, 
+            size: Vector2::ONE, 
+            source: None, 
+            flip_sprite: None 
+        };
+        func(&mut draw_data);
+        draw_data
     }
 }
 
@@ -47,7 +65,7 @@ impl DrawDataCache {
     }
 
     pub fn draw_cache(&mut self) {
-        self.cache.sort_by(|a, b| a.index.cmp(&b.index));
+        self.cache.sort_by(|a, b| (a.draw_layer as u8).cmp(&(b.draw_layer as u8)));
 
         let cache_iter: Iter<DrawData> = self.cache.iter();
         for draw_data in cache_iter {
@@ -55,8 +73,7 @@ impl DrawDataCache {
             let mut flip_y = false;
 
             if draw_data.flip_sprite.is_some() {
-                let flip_unwrapped = draw_data.flip_sprite.as_ref().unwrap();
-                match flip_unwrapped {
+                match draw_data.flip_sprite.unwrap() {
                     FlipSprite::FlipHorizontal => flip_x = true,
                     FlipSprite::FlipVertical => flip_y = true
                 }

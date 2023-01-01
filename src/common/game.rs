@@ -1,4 +1,4 @@
-use std::{time::Instant, ops::Add};
+use std::{time::Instant, ops::{Add, Deref, DerefMut}};
 use super::draw_data::DrawDataCache;
 use macroquad::prelude::*;
 use super::{assets::Assets, entity::*, player::Player, vector2::Vector2};
@@ -8,9 +8,9 @@ enum GameState {
 
 pub struct Game {
     screen_position: Vector2,
-    pub player: Player,
+    player: Player,
     assets: Assets,
-    entities: Vec<Box<dyn Entity>>,
+    entities: Entities,
     game_state: GameState,
     fps: f32
 }
@@ -21,13 +21,14 @@ impl Game {
             screen_position: Vector2::ZERO,
             player: Player::new(),
             assets: Assets::new(),
-            entities: Vec::new(),
+            entities: Entities::new(),
             game_state: GameState::InWorld,
             fps: 0.
         };
+
         game.init();
-        
-        return game;
+
+        game
     }
 
     pub fn init(&mut self) {
@@ -52,11 +53,8 @@ impl Game {
         match self.game_state {
             GameState::InWorld => {
                 self.screen_position.lerp(self.player.hitbox.center() - Vector2::new(screen_width(), screen_height()) * 0.5, 0.15);
-
                 self.player.update(delta_time);
-                for entity in &mut self.entities {
-                    entity.update(delta_time);
-                }
+                self.entities.update(delta_time);
             }
         }
         
@@ -66,12 +64,8 @@ impl Game {
         match self.game_state {
             GameState::InWorld => {
                 let mut cache: DrawDataCache = DrawDataCache::new();
-                for entity in &mut self.entities {
-                    entity.draw(&mut cache, &mut self.assets, self.screen_position);
-                }
-                
+                self.entities.draw(&mut cache, &mut self.assets, self.screen_position);
                 self.player.draw(&mut cache, &mut self.assets, self.screen_position);
-
                 cache.draw_cache();
             }
         }
