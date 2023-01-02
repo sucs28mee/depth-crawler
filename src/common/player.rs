@@ -1,5 +1,8 @@
-use macroquad::prelude::{is_key_down, KeyCode};
+use macroquad::prelude::{is_key_down, KeyCode, mouse_position_local};
+use macroquad::window::{screen_width, screen_height};
 
+use super::extensions::Vec2Extensions;
+use super::game::Game;
 use super::{entity::*, assets::Assets, vector2::Vector2, rectangle::Rectangle};
 use super::draw_data::*;
 pub struct Player {
@@ -7,16 +10,18 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn translate(&mut self, by: Vector2) {
-        self.hitbox.position += by;
+    pub fn translate(&mut self, translation: Vector2) {
+        self.hitbox.position += translation;
     }
+}
 
-    pub fn new() -> Self where Self: Sized {
-        Player { hitbox: Rectangle::new(0., 0., 50., 50.) }
+impl Entity for Player {
+    fn new() -> Self where Self: Sized {
+        Player { hitbox: Rectangle::new(0., 0., 80., 80.) }
     }
-
-    pub fn update(&mut self, delta_time: f32) {
-        let move_speed = 50. * delta_time;
+    
+    fn update(&mut self, game: &mut Game, delta_time: f32) {
+        let move_speed = 150. * delta_time;
         if is_key_down(KeyCode::D) {
             self.translate(Vector2::UNIT_X * move_speed);
         }
@@ -31,11 +36,19 @@ impl Player {
         }
     }
 
-    pub fn draw(&self, cache: &mut DrawDataCache, assets: &mut Assets, screen_position: Vector2) {
+    fn draw(&self, cache: &mut DrawDataCache, assets: &mut Assets, screen_position: Vector2) {
+        let draw_pos = self.hitbox.center() - screen_position;
+        let screen_size = Vector2::new(screen_width(), screen_height()) * 0.5;
+        let mouse_pos = mouse_position_local().as_vector2() * screen_size + screen_size;
+        let dir_to_mouse = draw_pos.dir_to(mouse_pos);
         cache.add(DrawData::new_custom(
             assets.get_texture("hekatomb.png").unwrap(), 
-            self.hitbox.position - screen_position,
-            |data| data.draw_layer = DrawLayer::OverEntities
+            draw_pos,
+            |data| {
+                data.draw_layer = DrawLayer::OverEntities;
+                data.rotation = dir_to_mouse.to_rotation();
+                data.origin = Vector2::new(data.texture.width(), data.texture.height()) * 0.5;
+            }
             )
         );
     }

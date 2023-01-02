@@ -7,3 +7,4 @@ mod rectangle;
 mod assets;
 mod player;
 mod entity;
+mod flying_entity;

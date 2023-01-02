@@ -90,7 +90,7 @@ impl DrawDataCache {
                     rotation: draw_data.rotation, 
                     flip_x, 
                     flip_y, 
-                    pivot: Some(Vec2::new(draw_data.origin.x, draw_data.origin.y)) 
+                    pivot: Some((draw_data.origin + draw_data.position).as_vec2()) 
                 }
             );
         }

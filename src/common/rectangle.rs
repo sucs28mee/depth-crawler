@@ -29,12 +29,12 @@ impl Rectangle {
 
     #[inline]
     pub fn center(&self) -> Vector2 {
-        self.position + self.size() * 0.5f32
+        self.position + self.size() * 0.5
     }
 
     #[inline]
     pub fn contains(&self, point: Vector2) -> bool {
-        point.x > self.position.x && point.y > self.position.y && 
+        point.x > self.position.x && point.y > self.position.y &&
             point.x < self.bottom_left().x && point.y < self.bottom_left().y
     }
 }

@@ -1,7 +1,7 @@
 mod common;
-use common::game::Game;
+use common::game;
 
 #[macroquad::main("Depth Crawler")]
 async fn main() {
-    Game::new().run().await;
+    game::run_game().await;
 }

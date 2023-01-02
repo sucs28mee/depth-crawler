@@ -1,5 +1,7 @@
 use std::ops::*;
 
+use macroquad::prelude::Vec2;
+
 #[derive(Clone, Copy, Debug)]
 pub struct Vector2 {
     pub x: f32,
@@ -16,6 +18,15 @@ impl Vector2 {
         Self { x, y }
     }
 
+    pub fn normalized(&self) -> Vector2 {
+        let mult = 1. / (self.x * self.x + self.y * self.y).sqrt();
+        Vector2 { x: self.x * mult, y: self.y * mult }
+    }
+
+    pub fn dir_to(&self, other: Vector2) -> Vector2 {
+        (other - *self).normalized()
+    }
+
     pub fn to_rotation(&self) -> f32 {
         self.y.atan2(self.x)
     }
@@ -23,6 +34,13 @@ impl Vector2 {
     pub fn lerp(&mut self, other: Vector2, t: f32) {
         self.x = self.x + t * (other.x - self.x);
         self.y = self.y + t * (other.y - self.y);
+    }
+
+    pub fn as_vec2(&self) -> Vec2 {
+        Vec2 {
+            x: self.x,
+            y: self.y
+        }
     }
 }
 

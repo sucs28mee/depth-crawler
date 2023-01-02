@@ -1,10 +1,12 @@
 use macroquad::{prelude::*};
+use super::game::Game;
+use super::player::Player;
 use super::{assets::Assets, vector2::Vector2};
 use super::draw_data::DrawDataCache;
 
 pub trait Entity {
     fn new() -> Self where Self: Sized;
-    fn update(&mut self, delta_time: f32);
+    fn update(&mut self, game: &mut Game, delta_time: f32);
     fn draw(&self, draw_cache: &mut DrawDataCache, assets: &mut Assets, screen_position: Vector2);
 }
 
@@ -21,9 +23,9 @@ impl Entities {
         self.cache.push(Box::new(T::new()));
     }
 
-    pub fn update(&mut self, delta_time: f32) {
+    pub fn update(&mut self, game: &mut Game, delta_time: f32) {
         for entity in &mut self.cache {
-            entity.update(delta_time);
+            entity.update(game, delta_time);
         }
     }
 
