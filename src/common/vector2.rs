@@ -31,6 +31,10 @@ impl Vector2 {
         self.y.atan2(self.x)
     }
 
+    pub fn to_tile_coords(&self) -> Vector2 {
+        Vector2 { x: self.x - self.x % 32., y: self.y - self.y % 32. }
+    }
+
     pub fn lerp(&mut self, other: Vector2, t: f32) {
         self.x = self.x + t * (other.x - self.x);
         self.y = self.y + t * (other.y - self.y);
@@ -41,6 +45,12 @@ impl Vector2 {
             x: self.x,
             y: self.y
         }
+    }
+}
+
+impl PartialEq for Vector2 {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y
     }
 }
 

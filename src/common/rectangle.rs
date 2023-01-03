@@ -1,3 +1,6 @@
+#![macro_use]
+use macroquad::{shapes::draw_rectangle, prelude::{RED, Rect}};
+
 use super::vector2::Vector2;
 
 #[derive(Clone, Copy, Debug)]
@@ -17,8 +20,24 @@ impl Rectangle {
         }
     }
 
+    pub fn translated(&self, translation: Vector2) -> Rectangle {
+        let mut copy = self.clone();
+        copy.position += translation;
+        copy
+    }
+
     #[inline]
-    pub fn bottom_left(&self) -> Vector2 {
+    pub fn bottom(&self) -> f32 {
+        self.position.y + self.height
+    }
+    
+    #[inline]
+    pub fn right(&self) -> f32 {
+        self.position.x + self.width
+    }
+
+    #[inline]
+    pub fn bottom_right(&self) -> Vector2 {
         self.position + self.size()
     }
 
@@ -35,6 +54,23 @@ impl Rectangle {
     #[inline]
     pub fn contains(&self, point: Vector2) -> bool {
         point.x > self.position.x && point.y > self.position.y &&
-            point.x < self.bottom_left().x && point.y < self.bottom_left().y
+            point.x < self.bottom_right().x && point.y < self.bottom_right().y
+    }
+
+    #[inline]
+    pub fn as_rect(&self) -> Rect {
+        Rect { x: self.position.y, y: self.position.y, w: self.width, h: self.height }
+    }
+
+    pub fn intersects(&self, other: &Rectangle) -> bool {
+        if other.position.x < self.right() && self.position.x < other.right() && other.position.y < self.bottom() {
+            return self.position.y < other.bottom();
+        }
+        false
+    }
+
+    pub fn draw(&self, offset: Vector2) {
+        let pos = self.position + offset;
+        draw_rectangle(pos.x, pos.y, self.width, self.height, RED);
     }
 }

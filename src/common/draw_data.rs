@@ -52,19 +52,21 @@ impl DrawData {
 }
 
 pub struct DrawDataCache {
-    cache: Vec<DrawData>
+    cache: Vec<DrawData>,
+    default_scale: f32
 }
 
 impl DrawDataCache {
     pub fn new() -> Self {
-        DrawDataCache { cache: Vec::new() }
+        DrawDataCache { cache: Vec::new(), default_scale: 2. }
     }
 
     pub fn add(&mut self, draw_data: DrawData) {
         self.cache.push(draw_data);
     }
 
-    pub fn draw_cache(&mut self) {
+    /// Draws whats in the cache and clears it.
+    pub fn draw(&mut self) {
         self.cache.sort_by(|a, b| (a.draw_layer as u8).cmp(&(b.draw_layer as u8)));
 
         let cache_iter: Iter<DrawData> = self.cache.iter();
@@ -79,20 +81,32 @@ impl DrawDataCache {
                 }
             }
 
+            let draw_pos = draw_data.position - draw_data.origin * 2.;
+            let mut frame_size: Vec2 = Vec2::new(draw_data.size.x, draw_data.size.y);
+            if draw_data.source.is_some() {
+                let source_ref = draw_data.source.as_ref().unwrap();
+                frame_size *= source_ref.size();
+            }
+            else {
+                frame_size *= Vec2::new(draw_data.texture.width(), draw_data.texture.height());
+            }
+
             draw_texture_ex(
                 draw_data.texture, 
-                draw_data.position.x,
-                draw_data.position.y,
+                draw_pos.x,
+                draw_pos.y,
                 draw_data.color,
-                DrawTextureParams { 
-                    dest_size: Some(Vec2::new(draw_data.size.x * draw_data.texture.width(), draw_data.size.y * draw_data.texture.height())),
-                    source: draw_data.source, 
-                    rotation: draw_data.rotation, 
-                    flip_x, 
-                    flip_y, 
-                    pivot: Some((draw_data.origin + draw_data.position).as_vec2()) 
+                DrawTextureParams {
+                    dest_size: Some(self.default_scale * frame_size),
+                    source: draw_data.source,
+                    rotation: draw_data.rotation,
+                    flip_x,
+                    flip_y,
+                    pivot: Some((draw_data.position).as_vec2())
                 }
             );
         }
+
+        self.cache.clear();
     }
 }

@@ -1,6 +1,7 @@
+extern crate proc_macro;
+
 use macroquad::{prelude::*};
 use super::game::Game;
-use super::player::Player;
 use super::{assets::Assets, vector2::Vector2};
 use super::draw_data::DrawDataCache;
 

@@ -20,8 +20,9 @@ impl Assets {
     pub fn get_texture(&mut self, path: &'static str) -> Result<Texture2D, AssetError> {
         if !self.asset_cache.contains_key(path) {
             let file = AssetLoader::get(path).ok_or(AssetError::AssetNotFound)?;
-
-            self.asset_cache.insert(path, Texture2D::from_file_with_format(&file.data, None));
+            let texture = Texture2D::from_file_with_format(&file.data, None);
+            texture.set_filter(FilterMode::Nearest);
+            self.asset_cache.insert(path, texture);
         }
 
         Ok(self.asset_cache[path])
